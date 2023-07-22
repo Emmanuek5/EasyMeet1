@@ -1,97 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Join Meet - EasyMeet</title>
-    <link href="/css/style.css" rel="stylesheet" />
-    <link href="/css/index.css" rel="stylesheet" />
-    <link href="/assets/computer.png" rel="icon" />
-    <link href="/css/joinmeet.css" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meet - EasyMeet</title>
+    <link rel="stylesheet" href="/css/meet.css" />
+    <link rel="icon" href="/assets/computer.png" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+    <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+    <script>
+      const room = "<%= room %>"; // Replace with your server-side value
+      const user = "<%= user %>"; // Replace with your server-side value
+      const audioOff = <%= audioOff %>; // Replace with your server-side value
+      const videoOff = <%= videoOff %>; // Replace with your server-side value
+    </script>
   </head>
   <body>
-    <% if (loggedIn) { %>
-    <script src="/js/modal.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/recieveinvite.js"></script>
     <audio id="sound"><source src="/assets/invite_alert.mp3" /></audio>
-    <script>
-      const user = "<%= user %>";
-    </script>
-    <% } %>
-
-    <nav class="navbar">
-      <div class="navbar__container">
-        <a href="/" class="navbar__brand">EasyMeet</a>
-        <ul class="navbar__links">
-          <% if (loggedIn) { %>
-          <li><a href="/join">Join Meet</a></li>
-          <li><a href="/help">Help</a></li>
-          <li><a href="/logout">Logout</a></li>
-          <% if (!isSignupPage()) { %>
-          <li><a href="/signup">Sign Up</a></li>
-          <% } %> <% } else { %>
-          <li><a href="/help">Help</a></li>
-          <li><a href="/login">Login</a></li>
-          <li><a href="/signup">Sign Up</a></li>
-          <% } %>
-        </ul>
+    <audio id="chat-alert"><source src="/assets/chat_alert.mp3" /></audio>
+    <div class="video-name"></div>
+    <div class="header">
+      <div class="logo">
+        <div class="header-back">
+          <i class="fas fa-angle-left"></i>
+        </div>
+        <h3>Meet - EasyMeet</h3>
       </div>
-    </nav>
-
-    <form action="/submitsettings" method="GET">
-      <div class="form-group">
-        <input type="checkbox" <% if(audioOff){ % />checked } %>name="audioOff"
-        id="audioOff">
-        <label for="audioOff">Turn off audio</label>
+    </div>
+    <div class="main">
+      <div class="main-left">
+        <div class="videos-group">
+          <div id="video-grid"></div>
+        </div>
+        <div class="options">
+          <div class="options-left">
+            <div id="muteButton" class="options-button">
+              <i class="fa fa-microphone"></i>
+            </div>
+            <div id="stopVideo" class="options-button">
+              <i class="fa fa-video-camera"></i>
+            </div>
+            <div id="leave" class="options-button background-red">
+              <i class="fa fa-phone"></i>
+            </div>
+          </div>
+          <div class="options-right">
+            <div id="showChat" class="options-button">
+              <i class="fa fa-comment"></i>
+            </div>
+            <div id="inviteButton" class="options-button">
+              <i class="fas fa-user-plus"></i>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <input type="checkbox" <% if(videoOff){ % />checked } %>name="videoOff"
-        id="videoOff">
-        <label for="videoOff">Turn off video</label>
+      <div class="main-right">
+        <div class="main-chat_window">
+          <div id="recievers">
+            <label style="color: white">Send to: </label>
+            <select id="dm-users">
+              <option>Everyone</option>
+              <!-- Add the list of users here -->
+            </select>
+          </div>
+          <br />
+          <div class="messages"></div>
+        </div>
+        <div class="main-message_container">
+          <input
+            id="chat_message"
+            type="text"
+            autocomplete="off"
+            placeholder="Type your message here..."
+          />
+          <div id="send" class="options-button">
+            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <input type="submit" value="OK" class="settings-button" />
-      </div>
-    </form>
-    <h2>Join Meet</h2>
-    <input id="room" placeholder="Type room here" class="room-input" />
-    <br /><br />
-    <button onclick="chooseRoom()" class="join-button">Enter room</button>
-    <br /><br />
-    <button onclick="location.href = '/meet/main'" class="join-button">
-      Join main meet
-    </button>
-    <br /><br />
-    <button onclick="invite()" class="invite-button">Invite someone</button>
-    <script>
-      document.getElementById("room").addEventListener("keydown", (e) => {
-        if (e.key == "Enter") chooseRoom();
-      });
-
-      function chooseRoom() {
-        var name = document.getElementById("room").value;
-        location.href = "/meet/" + name;
-      }
-
-      function invite() {
-        promptmodal("Invite someone", "Enter the name of the room first:").then(
-          (room) => {
-            promptmodal(
-              "Invite someone",
-              "Enter the user you want to invite:"
-            ).then((username) => {
-              socket.emit("new invitation", {
-                to: username,
-                from: user,
-                room: room,
-              });
-              alertmodal(
-                "Invite someone",
-                `You have invited ${username} to the room <span style="color:blue">${room}</span>!`
-              ).then(() => (location.href = "/meet/" + room));
-            });
-          }
-        );
-      }
-    </script>
+    </div>
+    <script src="/js/modal.js"></script>
+    <script src="/js/recieveinvite.js"></script>
+    <script src="/js/meet.js"></script>
+    <script src="/js/chat.js"></script>
   </body>
 </html>
