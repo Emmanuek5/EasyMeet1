@@ -4,7 +4,7 @@ const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header-back");
 const dmusers = document.querySelector("#dm-users");
 const videoName = document.querySelector(".video-name");
-const myUsername = user; // Replace with the current user's username
+const myUsername = "JohnDoe"; // Replace with the current user's username
 
 myVideo.muted = true;
 
@@ -37,8 +37,6 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myUsername, myVideo, stream); // Use myUsername instead of "user" variable
-    myVideoStream.getAudioTracks()[0].enabled = true;
-    myVideoStream.getVideoTracks()[0].enabled = true;
 
     // Screen Share functionality
     const shareScreenButton = document.getElementById("shareScreenButton");
@@ -53,11 +51,8 @@ navigator.mediaDevices
         userVideo.srcObject = screenShareStream;
         userVideo.muted = true;
         socket.emit("startScreenShare");
-        myVideoStream.getVideoTracks().forEach((track) => {
-          track.stop();
-        });
         shareScreenButton.removeEventListener("click", startScreenShare);
-        userVideo.addEventListener("click", stopScreenShare);
+        shareScreenButton.addEventListener("click", stopScreenShare);
       } catch (err) {
         console.error("Error starting screen share:", err);
       }
@@ -66,16 +61,13 @@ navigator.mediaDevices
     function stopScreenShare() {
       const userVideo = document.getElementById("user_" + myUsername);
       userVideo.srcObject = myVideoStream;
-      shareScreenButton.addEventListener("click", startScreenShare);
-      screenShareStream.getTracks().forEach((track) => {
-        track.stop();
-      });
+      userVideo.muted = false;
       socket.emit("stopScreenShare");
+      shareScreenButton.removeEventListener("click", stopScreenShare);
+      shareScreenButton.addEventListener("click", startScreenShare);
     }
 
     shareScreenButton.addEventListener("click", startScreenShare);
-
-    myVideo.addEventListener("click", stopScreenShare);
 
     socket.on("startScreenShare", () => {
       const userVideo = document.getElementById("user_" + myUsername);
@@ -86,7 +78,7 @@ navigator.mediaDevices
     socket.on("stopScreenShare", () => {
       const userVideo = document.getElementById("user_" + myUsername);
       userVideo.srcObject = myVideoStream;
-      userVideo.muted = false;
+      userVideo.muted = true;
     });
     // End of Screen Share functionality
 
