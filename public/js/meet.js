@@ -120,6 +120,26 @@ function addVideoStream(username, video, stream) {
   video.addEventListener("contextmenu", (e) => {
     e.preventDefault();
   });
+
+  // Audio volume analysis and shadow effect
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioContext.createAnalyser();
+  const source = audioContext.createMediaStreamSource(stream);
+  source.connect(analyser);
+  analyser.fftSize = 256;
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  function detectAudioVolume() {
+    analyser.getByteFrequencyData(dataArray);
+    const average = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
+    const intensity = Math.min(1, average / 128); // Normalize intensity between 0 and 1
+    const shadowIntensity = 255 - Math.round(255 * intensity); // Invert intensity for shadow value
+    const shadowColor = `rgba(0, 0, 255, ${shadowIntensity / 255})`; // Blue shadow with variable opacity
+    video.style.boxShadow = `0 0 15px 5px ${shadowColor}`;
+    requestAnimationFrame(detectAudioVolume);
+  }
+  detectAudioVolume();
 }
 
 let text = document.querySelector("#chat_message");
@@ -129,7 +149,6 @@ let messages = document.querySelector(".messages");
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");
 const stopVideo = document.querySelector("#stopVideo");
-
 muteButton.addEventListener("click", () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
   if (enabled) {
@@ -160,57 +179,16 @@ stopVideo.addEventListener("click", () => {
   }
 });
 
-const shareScreenButton = document.getElementById("shareScreenButton");
-let screenShareStream;
-let isScreenSharing = false;
-
-function startScreenShare() {
-  navigator.mediaDevices
-    .getDisplayMedia({ video: true })
-    .then((stream) => {
-      screenShareStream = stream;
-      const screenShareVideo = document.createElement("video");
-      addVideoStream("ScreenShare", screenShareVideo, screenShareStream);
-      socket.emit("startScreenShare", myUsername);
-      isScreenSharing = true;
-      shareScreenButton.innerText = "Stop Sharing";
-    })
-    .catch((error) => {
-      console.error("Error starting screen share:", error);
-    });
-}
-
-function stopScreenShare() {
-  if (screenShareStream) {
-    screenShareStream.getTracks().forEach((track) => track.stop());
-  }
-  socket.emit("stopScreenShare");
-  isScreenSharing = false;
-  shareScreenButton.innerText = "Share Screen";
-}
-
-shareScreenButton.addEventListener("click", () => {
-  if (isScreenSharing) {
-    stopScreenShare();
-  } else {
-    startScreenShare();
-  }
-});
-
-socket.on("startScreenShare", (username) => {
-  if (!isScreenSharing) {
-    startScreenShare();
-  }
-});
-
-socket.on("stopScreenShare", () => {
-  if (isScreenSharing) {
-    stopScreenShare();
-  }
-});
-
 inviteButton.addEventListener("click", () => {
-  copyModal("Invite Via Link", "Copy Link", location.href);
+  promptmodal(
+    "Invite someone",
+    "Enter the user you want to invite to this meet:"
+  ).then((username) => {
+    socket.emit("new invitation", { to: username, from: user, room: room });
+    alertmodal("Invited!", `You have invited ${username} to this meet!`).then(
+      console.log
+    );
+  });
 });
 
 document
