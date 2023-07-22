@@ -2,37 +2,247 @@
 <html>
   <head>
     <title>Home - EasyMeet</title>
-    <link href="/css/style.css" rel="stylesheet">
-    <link href="/css/index.css" rel="stylesheet">
-    <link href="/assets/computer.png" rel="icon">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link href="/css/style.css" rel="stylesheet" />
+    <link href="/css/index.css" rel="stylesheet" />
+    <link href="/assets/computer.png" rel="icon" />
     <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+    <style>
+      body {
+        text-align: center;
+        font-family: Roboto;
+        color: white;
+        margin: 0;
+      }
+      #main-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      #video-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      #videoElement {
+        width: 100%;
+        max-width: 640px;
+        height: auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px; /* Add margin to separate buttons from video */
+      }
+      .button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .control-button {
+        padding: 10px;
+        font-size: 16px;
+        background: #727acd;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s, transform 0.2s;
+      }
+      .control-button i {
+        margin-right: 5px;
+      }
+      .control-button:hover {
+        background: #5e6ebe;
+      }
+      .control-button.clicked {
+        transform: scale(0.95);
+      }
+      .control-button.clicked i[data-icon="microphone"]::before {
+        content: "\f130"; /* This is the microphone-slash icon */
+      }
+      .control-button.clicked i[data-icon="video"]::before {
+        content: "\f4f7"; /* This is the video-slash icon */
+      }
+      #description-text-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+      }
+      #description-text {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      .button {
+        margin: 5px;
+      }
+
+      /* Media Queries */
+      @media screen and (max-width: 768px) {
+        #main-container {
+          flex-direction: column;
+        }
+        #videoElement {
+          width: 90%;
+          max-width: none;
+          height: auto;
+        }
+        #description-text-wrapper {
+          margin-top: 40px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <%- include("nav.html") %>
     <div id="top-description">
-      <img id="meet-image" src="/assets/meet.png">
-      <div id="description-text-wrapper">
-        <% if(loggedIn) { %>
-        <h1 id="description-text">Welcome, <%= user %>! EasyMeet allows you to meet with people online.<h1>
-        <button class="button background-blue" onclick="location.href = '/join'">Join Meet</button><br>
-        <button class="button" onclick="location.href = '/help'">Help Page</button>
-        <% } else { %>
-        <h1 id="description-text">EasyMeet is a simple-to-use website for video conferencing, without any downloading required. Meet in the browser.<h1>
-        <button class="button background-blue" onclick="location.href = '/signup'">Get started - It's free</button><br>
-        <button class="button" onclick="location.href = '/login'">Login</button>
-        <% } %>
+      <div id="main-container">
+        <div id="video-container">
+          <video id="videoElement" autoplay></video>
+          <div class="button-container">
+            <button class="control-button" onclick="toggleAudio()">
+              <i
+                class="fas fa-microphone microphone-icon"
+                data-icon="microphone"
+              ></i>
+            </button>
+            <button class="control-button" onclick="toggleVideo()">
+              <i class="fas fa-video video-icon" data-icon="video"></i>
+            </button>
+          </div>
+        </div>
+        <div id="description-text-wrapper">
+          <% if(loggedIn) { %>
+          <h1 id="description-text">
+            Welcome, <%= user %>! EasyMeet allows you to meet with people
+            online.
+          </h1>
+          <button
+            class="button background-blue"
+            onclick="location.href = '/join'"
+          >
+            Join Meet</button
+          ><br />
+          <button class="button" onclick="location.href = '/help'">
+            Help Page
+          </button>
+          <% } else { %>
+          <h1 id="description-text">
+            Chat with Your Friends Securely And For Free
+          </h1>
+          <button
+            class="button background-blue"
+            onclick="location.href = '/signup'"
+          >
+            Get started - It's free</button
+          ><br />
+          <button class="button" onclick="location.href = '/login'">
+            Login
+          </button>
+          <% } %>
+        </div>
       </div>
-    </div><br><br>
-    <div id="features">
-      <h1>Features</h1>
-      <div class="feature"><h3>Chat</h3>Microphone not working? Use the chat box.</div>
-      <div class="feature"><h3>Private Messaging</h3>Choose who you want to send your messages to.</div><br>
-      <div class="feature"><h3>Inviting</h3>Invite people and have the invite instantly appear to them online.</div>
-      <div class="feature"><h3>Video/Audio</h3>Turn off your video or audio if you don't want to be seen or heard.</div>
-    </div><br><br>
-    <% if(!loggedIn) { %>
-    <h2>Use this, for free.</h2>
-    <button class="button" onclick="location.href = '/signup'">Sign Up</button><br><br>
-    <% } %>
+    </div>
+
+    <script>
+      const videoElement = document.getElementById("videoElement");
+      let stream = null;
+
+      async function startCamera() {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
+          videoElement.srcObject = stream;
+        } catch (err) {
+          console.error("Error accessing camera and microphone:", err);
+        }
+      }
+
+      function stopCamera() {
+        if (stream) {
+          const tracks = stream.getTracks();
+          tracks.forEach((track) => track.stop());
+          videoElement.srcObject = null;
+        }
+      }
+
+      function toggleAudio() {
+        setTimeout(() => {}, 5000);
+        if (!stream) {
+          console.error("Stream not available.");
+          return;
+        }
+
+        const audioTrack = stream.getAudioTracks()[0];
+        if (!audioTrack) {
+          console.error("Audio track not found.");
+          return;
+        }
+
+        audioTrack.enabled = !audioTrack.enabled;
+
+        // Toggle microphone icon
+        const microphoneIcon = document.querySelector(".microphone-icon");
+        microphoneIcon.classList.toggle("fa-microphone");
+        microphoneIcon.classList.toggle("fa-microphone-slash");
+
+        // Show a tooltip or notification indicating audio status
+        const audioStatus = audioTrack.enabled ? "Audio On" : "Audio Off";
+        console.log(audioStatus);
+      }
+
+      function toggleVideo() {
+        setTimeout(() => {}, 5000);
+        if (!stream) {
+          console.error("Stream not available.");
+          return;
+        }
+
+        const videoTrack = stream.getVideoTracks()[0];
+        if (!videoTrack) {
+          console.error("Video track not found.");
+          return;
+        }
+
+        videoTrack.enabled = !videoTrack.enabled;
+
+        // Toggle video icon
+        const videoIcon = document.querySelector(".video-icon");
+        if (videoIcon.classList.contains("fa-video")) {
+          videoIcon.classList.remove("fa-video");
+          videoIcon.classList.add("fa-video-slash");
+        } else {
+          videoIcon.classList.remove("fa-video-slash");
+          videoIcon.classList.add("fa-video");
+        }
+
+        // Show a tooltip or notification indicating video status
+        const videoStatus = videoTrack.enabled ? "Video On" : "Video Off";
+        console.log(videoStatus);
+      }
+
+      // Add click event listeners to the control buttons to toggle the "clicked" class
+      const controlButtons = document.querySelectorAll(".control-button");
+      controlButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          button.classList.toggle("clicked");
+        });
+      });
+
+      startCamera();
+    </script>
   </body>
 </html>

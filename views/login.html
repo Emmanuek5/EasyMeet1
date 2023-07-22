@@ -2,19 +2,112 @@
 <html>
   <head>
     <title>Login - EasyMeet</title>
-    <link href="/css/style.css" rel="stylesheet">
-    <link href="/css/loginsignup.css" rel="stylesheet">
-    <link href="/assets/computer.png" rel="icon">
+    <link href="/css/style.css" rel="stylesheet" />
+    <link href="/css/login.css" rel="stylesheet" />
+    <link href="/assets/computer.png" rel="icon" />
+    <style>
+      body {
+        text-align: center;
+        font-family: Roboto, sans-serif;
+        color: #333;
+        margin: 0;
+      }
+
+      .login-container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: whitesmoke;
+      }
+
+      h1 {
+        font-size: 36px;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      label {
+        font-size: 18px;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      .login-button {
+        width: 100%;
+        padding: 10px;
+        font-size: 18px;
+        background-color: #727acd;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .login-button:hover {
+        background-color: #5e6ebe;
+      }
+
+      p {
+        font-size: 16px;
+        margin-top: 20px;
+      }
+
+      p a {
+        color: #727acd;
+        text-decoration: none;
+      }
+
+      p a:hover {
+        text-decoration: underline;
+      }
+
+      /* Style for the "Sign Up" link */
+      .signup-link {
+        color: #727acd;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .signup-link:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
     <%- include("nav.html") %>
-    <h1>Login</h1><br>
-    <form action="/loginsubmit" method="post">
-      <h3>Username: <h3><input name="username" required><br><br>
-      <h3>Password: </h3><input type="password" name="password" required><br><br>
-      <input type="submit" value="Login">
-      <br><br><br>
-    </form>
-    <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+    <div class="login-container">
+      <h1>Login</h1>
+      <form action="/loginsubmit" method="post">
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <input type="submit" value="Login" class="login-button" />
+      </form>
+      <p>
+        Don't have an account?
+        <a href="/signup" class="signup-link" style="color: blue">Sign Up</a>
+      </p>
+    </div>
   </body>
 </html>

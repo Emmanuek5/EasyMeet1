@@ -1,18 +1,70 @@
-<% if(loggedIn) { %>
-<script src="/js/modal.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/recieveinvite.js"></script>
-<audio id="sound"><source src="/assets/invite_alert.mp3"></audio>
-<script>
-  const user = "<%= user %>";
-</script>
-<% } %>
-<nav>
-  <a href="/">Home</a><% if(loggedIn) { %>
-  <a href="/join">Join Meet</a>
-  <a href="/help">Help</a>
-  <a href="/logout">Logout</a><% } else { %>
-  <a href="/help">Help</a>
-  <a href="/login">Login</a>
-  <a href="/signup">Sign Up</a><% } %>
-</nav><br><br><br><br>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home - EasyMeet</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link href="/css/style.css" rel="stylesheet" />
+    <link href="/css/navbar.css" rel="stylesheet" />
+    <link href="/assets/computer.png" rel="icon" />
+    <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+  </head>
+  <body>
+    <% if(loggedIn) { %>
+    <script src="/js/modal.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/recieveinvite.js"></script>
+    <audio id="sound"><source src="/assets/invite_alert.mp3" /></audio>
+    <script>
+      const user = "<%= user %>";
+    </script>
+    <% } %>
+
+    <nav class="navbar">
+      <div class="navbar__container">
+        <a href="/" class="navbar__brand">EasyMeet</a>
+        <ul class="navbar__links">
+          <% if (loggedIn) { %>
+          <li><a href="/join">Join Meet</a></li>
+          <li><a href="/help">Help</a></li>
+          <li><a href="/logout">Logout</a></li>
+          <% if (!isSignupPage()) { %>
+          <li><a href="/signup">Sign Up</a></li>
+          <% } %> <% } else { %>
+          <li><a href="/help">Help</a></li>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/signup">Sign Up</a></li>
+          <% } %>
+        </ul>
+      </div>
+    </nav>
+
+    <script>
+      // JavaScript function to determine if the current page is the signup page
+      function isSignupPage() {
+        console.log("Hello");
+        return window.location.pathname === "/signup";
+      }
+      function isLoginPage() {
+        console.log("Hello");
+        return window.location.pathname === "/login";
+      }
+
+      // Get the navigation links
+      const navLinks = document.querySelectorAll(".navbar__links li a");
+
+      // Loop through the navigation links and update their visibility
+      navLinks.forEach((link) => {
+        if (link.getAttribute("href") === "/signup") {
+          link.style.display = isSignupPage() ? "none" : "block";
+        }
+      });
+    </script>
+
+    <div id="top-description">
+      <!-- Your content here -->
+    </div>
+  </body>
+</html>
