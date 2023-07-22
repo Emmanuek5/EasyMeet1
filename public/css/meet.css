@@ -1,28 +1,85 @@
-body {
-  text-align: center;
-  font-family: Roboto, sans-serif;
-  color: #333;
-  margin: 0;
+
+
+/* Header Styles */
+.header {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  align-items: center;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.header-back {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+/* Main Content Styles */
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.settings-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.room-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.join-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.invite-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+/* Navbar Styles */
 .navbar {
-  background-color: #727ACD;
-  padding: 10px 0;
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
 }
 
 .navbar__container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .navbar__brand {
-  color: #fff;
   font-size: 24px;
   text-decoration: none;
+  color: #fff;
 }
 
 .navbar__links {
@@ -30,132 +87,66 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-  align-items: center;
 }
 
 .navbar__links li {
-  margin-right: 15px;
+  margin-left: 15px;
 }
 
-.navbar__links li a {
+.navbar__links a {
+  text-decoration: none;
   color: #fff;
-  font-size: 18px;
-  text-decoration: none;
-  padding: 5px 10px;
 }
 
-.signup-container {
-  max-width: 500px;
-  margin: 50px auto;
-  padding: 20px;
+/* Chat Window Styles */
+.main-chat_window {
+  background-color: #fff;
   border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: whitesmoke;
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-h1 {
-  font-size: 36px;
-  margin-bottom: 30px;
+.messages {
+  margin-bottom: 10px;
 }
 
-.form-group {
+/* Options Styles */
+.options {
+  display: flex;
+  justify-content: space-between;
+}
+
+.options-button {
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.options-right {
+  display: flex;
+}
+
+.background-red {
+  background-color: #ff0000;
+}
+
+/* Video Grid Styles */
+.videos-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-gap: 10px;
   margin-bottom: 20px;
-  text-align: left;
 }
 
-label {
-  font-size: 18px;
-  display: block;
-  margin-bottom: 5px;
-}
-
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
+.video-grid-item {
   border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
+  padding: 5px;
 }
 
-.login-button {
-  width: 100%;
-  padding: 10px;
-  font-size: 18px;
-  background-color: #727acd;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.login-button:hover {
-  background-color: #5e6ebe;
-}
-
-p {
-  font-size: 16px;
-  margin-top: 20px;
-}
-
-p a {
-  color: #727acd;
-  text-decoration: none;
-}
-
-p a:hover {
-  text-decoration: underline;
-}
-
-.settings-button {
-  width: 100%;
-  padding: 10px;
-  font-size: 18px;
-  background-color: #727acd;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.settings-button:hover {
-  background-color: #5e6ebe;
-}
-
-.room-input {
-  font-size: 20px;
-  width: 200px;
-}
-
-.join-button {
-  width: 200px;
-  padding: 10px;
-  font-size: 18px;
-  background-color: #727acd;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.join-button:hover {
-  background-color: #5e6ebe;
-}
-
-.invite-button {
-  width: 200px;
-  padding: 10px;
-  font-size: 18px;
-  background-color: #727acd;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.invite-button:hover {
-  background-color: #5e6ebe;
+.video-name {
+  font-weight: bold;
+  margin-bottom: 10px;
 }
