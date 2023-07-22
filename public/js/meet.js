@@ -160,15 +160,7 @@ stopVideo.addEventListener("click", () => {
 });
 
 inviteButton.addEventListener("click", () => {
-  promptmodal(
-    "Invite someone",
-    "Enter the user you want to invite to this meet:"
-  ).then((username) => {
-    socket.emit("new invitation", { to: username, from: user, room: room });
-    alertmodal("Invited!", `You have invited ${username} to this meet!`).then(
-      console.log
-    );
-  });
+ copyModal("Invite Via Link",location.href,"Copy Link")
 });
 
 document
