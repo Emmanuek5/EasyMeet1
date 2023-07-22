@@ -28,6 +28,15 @@ input[type="submit"] {
 #description-text-wrapper {
   padding-top:3px;
 }
+.background-red {
+  background-color: red;
+  /* You can customize the background color to your preference */
+}
+
+.control-button.clicked.background-red {
+  background-color: red;
+  /* Red background when the button is clicked */
+}
 #meet-image {
   float:left;
   width:45%;

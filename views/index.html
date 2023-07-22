@@ -111,14 +111,11 @@
         <div id="video-container">
           <video id="videoElement" autoplay></video>
           <div class="button-container">
-            <button class="control-button" onclick="toggleAudio()">
-              <i
-                class="fas fa-microphone microphone-icon"
-                data-icon="microphone"
-              ></i>
+            <button class="control-button mute_button" onclick="toggleAudio()">
+              <i class="fas fa-microphone" id="muteButton"></i>
             </button>
-            <button class="control-button" onclick="toggleVideo()">
-              <i class="fas fa-video video-icon" data-icon="video"></i>
+            <button class="control-button video_button" onclick="toggleVideo()">
+              <i class="fas fa-video" id="stopVideo"></i>
             </button>
           </div>
         </div>
@@ -157,82 +154,56 @@
 
     <script>
       const videoElement = document.getElementById("videoElement");
-      let stream = null;
+      let myVideoStream = null;
+      let audioOff = false;
+      let videoOff = false;
+      const muteButton = document.getElementById("muteButton");
+      const stopVideo = document.getElementById("stopVideo");
+      const main_mute = document.querySelector(".mute_button");
+      const main_video = document.querySelector(".video_button");
 
       async function startCamera() {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({
+          myVideoStream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true,
           });
-          videoElement.srcObject = stream;
+          videoElement.srcObject = myVideoStream;
         } catch (err) {
           console.error("Error accessing camera and microphone:", err);
         }
       }
 
-      function stopCamera() {
-        if (stream) {
-          const tracks = stream.getTracks();
-          tracks.forEach((track) => track.stop());
-          videoElement.srcObject = null;
-        }
-      }
-
       function toggleAudio() {
-        setTimeout(() => {}, 5000);
-        if (!stream) {
-          console.error("Stream not available.");
-          return;
+        audioOff = !audioOff;
+        myVideoStream.getAudioTracks()[0].enabled = !audioOff;
+        if (audioOff) {
+          muteButton.classList.add("fa-microphone-slash");
+          muteButton.classList.remove("fa-microphone");
+          main_mute.classList.add("background-red"); // Add the red background class
+        } else {
+          muteButton.classList.add("fa-microphone");
+          muteButton.classList.remove("fa-microphone-slash");
+          main_mute.classList.remove("background-red"); // Remove the red background class
         }
-
-        const audioTrack = stream.getAudioTracks()[0];
-        if (!audioTrack) {
-          console.error("Audio track not found.");
-          return;
-        }
-
-        audioTrack.enabled = !audioTrack.enabled;
-
-        // Toggle microphone icon
-        const microphoneIcon = document.querySelector(".microphone-icon");
-        microphoneIcon.classList.toggle("fa-microphone");
-        microphoneIcon.classList.toggle("fa-microphone-slash");
-
-        // Show a tooltip or notification indicating audio status
-        const audioStatus = audioTrack.enabled ? "Audio On" : "Audio Off";
-        console.log(audioStatus);
       }
 
       function toggleVideo() {
-        setTimeout(() => {}, 5000);
-        if (!stream) {
-          console.error("Stream not available.");
-          return;
-        }
-
-        const videoTrack = stream.getVideoTracks()[0];
-        if (!videoTrack) {
-          console.error("Video track not found.");
-          return;
-        }
-
-        videoTrack.enabled = !videoTrack.enabled;
-
-        // Toggle video icon
-        const videoIcon = document.querySelector(".video-icon");
-        if (videoIcon.classList.contains("fa-video")) {
-          videoIcon.classList.remove("fa-video");
-          videoIcon.classList.add("fa-video-slash");
+        videoOff = !videoOff;
+        myVideoStream.getVideoTracks()[0].enabled = !videoOff;
+        if (videoOff) {
+          stopVideo.classList.add("fa-video-slash");
+          stopVideo.classList.remove("fa-video");
+          // Add the red background class
+          main_video.classList.add("background-red");
         } else {
-          videoIcon.classList.remove("fa-video-slash");
-          videoIcon.classList.add("fa-video");
+          stopVideo.classList.add("fa-video");
+          stopVideo.classList.remove("fa-video-slash");
+          main_video.classList.remove("background-red"); // Remove the red background class
         }
-
-        // Show a tooltip or notification indicating video status
-        const videoStatus = videoTrack.enabled ? "Video On" : "Video Off";
-        console.log(videoStatus);
       }
+
+      // Rest of the code remains the same
 
       // Add click event listeners to the control buttons to toggle the "clicked" class
       const controlButtons = document.querySelectorAll(".control-button");
