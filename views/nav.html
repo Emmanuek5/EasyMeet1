@@ -26,13 +26,11 @@
       <div class="navbar__container">
         <a href="/" class="navbar__brand">EasyMeet</a>
         <ul class="navbar__links">
-          <% if (loggedIn) { %>
+          <% if(loggedIn) { %>
           <li><a href="/join">Join Meet</a></li>
           <li><a href="/help">Help</a></li>
           <li><a href="/logout">Logout</a></li>
-          <% if (!isSignupPage()) { %>
-          <li><a href="/signup">Sign Up</a></li>
-          <% } %> <% } else { %>
+          <% } else { %>
           <li><a href="/help">Help</a></li>
           <li><a href="/login">Login</a></li>
           <li><a href="/signup">Sign Up</a></li>
@@ -40,28 +38,6 @@
         </ul>
       </div>
     </nav>
-
-    <script>
-      // JavaScript function to determine if the current page is the signup page
-      function isSignupPage() {
-        console.log("Hello");
-        return window.location.pathname === "/signup";
-      }
-      function isLoginPage() {
-        console.log("Hello");
-        return window.location.pathname === "/login";
-      }
-
-      // Get the navigation links
-      const navLinks = document.querySelectorAll(".navbar__links li a");
-
-      // Loop through the navigation links and update their visibility
-      navLinks.forEach((link) => {
-        if (link.getAttribute("href") === "/signup") {
-          link.style.display = isSignupPage() ? "none" : "block";
-        }
-      });
-    </script>
 
     <div id="top-description">
       <!-- Your content here -->
