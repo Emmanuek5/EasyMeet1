@@ -107,22 +107,21 @@
     </div>  
     <div class="main">  
     <div class="main-left">
-      <div class="videos-group">
-        <div id="video-grid"></div>
-      </div>
-      <div class="options">
-        <div class="options-left">
-          <div id="muteButton" class="options-button"><i class="fa fa-microphone"></i></div>
-          <div id="stopVideo" class="options-button"><i class="fa fa-video-camera"></i></div>
-          <div id="leave" class="options-button background-red"><i class="fa fa-phone"></i></div>
-        </div>
-        <div class="options-right">
-  <div id="showChat" class="options-button"><i class="fa fa-comment"></i></div>
-  <div id="inviteButton" class="options-button"><i class="fas fa-user-plus"></i></div>
-  <!-- Add the "Share Screen" button with a custom id -->
-  <div id="shareScreenButton" class="options-button">
-    <i class="fa fa-desktop"></i>
+     <div id="video-grid">
+  <div class="video-container" id="user_video">
+    <video id="my-video" playsinline muted></video>
+    <div class="user-info">"<%= user %></div>
   </div>
+</div>
+
+<div class="controls">
+  <button id="shareScreenButton">Share Screen</button>
+  <button id="muteButton"><i class="fas fa-microphone"></i></button>
+  <button id="stopVideo"><i class="fas fa-video"></i></button>
+  <button id="inviteButton">Invite</button>
+  <button id="leave">Leave</button>
+</div>
+      
 </div>
       </div>
     </div>
