@@ -160,7 +160,7 @@ stopVideo.addEventListener("click", () => {
 });
 
 inviteButton.addEventListener("click", () => {
- copyModal("Invite Via Link",location.href,"Copy Link")
+ copyModal("Invite Via Link", "Copy Link", location.href);
 });
 
 document

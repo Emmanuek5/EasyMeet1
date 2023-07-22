@@ -220,100 +220,59 @@ function promptmodal(title, text, ok, focus, highlight, readonly){
 	});
 }
 
-function copyModal(title, text, highlight) {
-  return new Promise(function(resolve, reject) {
-    if (document.getElementsByClassName("modal-content").length > 0)
-      modal.remove();
-    modal = document.createElement("div");
-    document.body.appendChild(modal);
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="container">
-          <h1>${title}</h1>
-          <p style="font-size: 16px; margin: auto" id="p">${text}</p>
-          <br>
-          <input
-            type="text"
-            class="text"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-          />
-          <div class="clearfix">
-            <button class="cancelbtn">Cancel</button>
-            <button class="copybtn">Copy</button>
-          </div>
-        </div>
-      </div>
-    `;
-    modal.setAttribute(
-      "style",
-      "position: fixed; z-index: 100; left: 0; top: 0; width: 100vw; height: 100vh; padding-top: 50px; background-color: rgba(0, 0, 0, 0.3);"
-    );
-    content = document.querySelector(".modal-content");
-    content.setAttribute(
-      "style",
-      "background-color: #FFF; margin: 5% auto 15% auto; border: 2px solid blue; border-radius: 5px; width: 30%"
-    );
-    document.querySelector(".container").style.padding = "16px";
-    document.querySelector(".clearfix").style.textAlign = "right";
-    cancelbtn = document.querySelector(".cancelbtn");
-    copybtn = document.querySelector(".copybtn");
-    input = document.querySelector(".text");
-    input.focus();
-    if (highlight !== undefined && highlight !== false) {
-      input.value = highlight;
-      input.select();
-    }
-    input.setAttribute(
-      "style",
-      "width: 90%; height: 30px; margin-bottom: 10px; font-size: 16px; outline: none; border: 1px solid #0000FF; border-radius: 2px; margin-left: 5%; margin-right:5%"
-    );
-    cancelbtn.addEventListener("click", function() {
-      modal.remove();
-      reject();
+  function copyModal(title, text, highlight) {
+    return new Promise(function (resolve, reject) {
+      const modalContainer = document.createElement("div");
+      modalContainer.classList.add("modal-container");
+
+      const modalContent = document.createElement("div");
+      modalContent.classList.add("modal-content");
+      modalContainer.appendChild(modalContent);
+
+      const titleElement = document.createElement("h1");
+      titleElement.classList.add("modal-title");
+      titleElement.textContent = title;
+      modalContent.appendChild(titleElement);
+
+      const textElement = document.createElement("p");
+      textElement.classList.add("modal-text");
+      textElement.textContent = text;
+      modalContent.appendChild(textElement);
+
+      const inputElement = document.createElement("input");
+      inputElement.classList.add("modal-input");
+      inputElement.type = "text";
+      inputElement.autocomplete = "off";
+      inputElement.autocorrect = "off";
+      inputElement.autocapitalize = "off";
+      inputElement.spellcheck = false;
+      inputElement.value = highlight || "";
+      modalContent.appendChild(inputElement);
+
+      const buttonsContainer = document.createElement("div");
+      buttonsContainer.classList.add("modal-buttons");
+      modalContent.appendChild(buttonsContainer);
+
+      const cancelButton = document.createElement("button");
+      cancelButton.classList.add("modal-button");
+      cancelButton.textContent = "Cancel";
+      cancelButton.addEventListener("click", function () {
+        document.body.removeChild(modalContainer);
+        reject();
+      });
+      buttonsContainer.appendChild(cancelButton);
+
+      const copyButton = document.createElement("button");
+      copyButton.classList.add("modal-button");
+      copyButton.textContent = "Copy";
+      copyButton.addEventListener("click", function () {
+        inputElement.select();
+        document.execCommand("copy");
+        document.body.removeChild(modalContainer);
+        resolve();
+      });
+      buttonsContainer.appendChild(copyButton);
+
+      document.body.appendChild(modalContainer);
     });
-    copybtn.addEventListener("click", function() {
-      input.select();
-      document.execCommand("copy");
-      modal.remove();
-      resolve();
-    });
-    cancelbtn.setAttribute(
-      "style",
-      "border: 2px solid #0000FF; height: 50px; outline: none; background-color: #FFF; color: #0000FF; border-radius: 5px; width: 125px; font-size: 16px; user-select: none"
-    );
-    copybtn.setAttribute(
-      "style",
-      "border: 2px solid #0000FF; height: 50px; outline: none; background-color: #0000FF; color: #FFF; border-radius: 5px; width: 125px; font-size: 16px; user-select: none"
-    );
-    if (window.innerWidth <= 700) {
-      content.style.width = "60%";
-    } else if (window.innerWidth > 700 && window.innerWidth <= 950) {
-      content.style.width = "50%";
-    }
-    cancelbtn.addEventListener("mouseover", function() {
-      cancelbtn.style.cursor = "pointer";
-      cancelbtn.style.transition = "all 0.3s ease-in-out";
-      cancelbtn.style.color = "#FFF";
-      cancelbtn.style.border = "2px solid #00008B";
-      cancelbtn.style.backgroundColor = "#00008B";
-    });
-    cancelbtn.addEventListener("mouseleave", function() {
-      cancelbtn.style.backgroundColor = "#FFF";
-      cancelbtn.style.border = "2px solid #0000FF";
-      cancelbtn.style.color = "#0000FF";
-    });
-    copybtn.addEventListener("mouseover", function() {
-      copybtn.style.cursor = "pointer";
-      copybtn.style.transition = "all 0.3s ease-in-out";
-      copybtn.style.border = "2px solid #00008B";
-      copybtn.style.backgroundColor = "#00008B";
-    });
-    copybtn.addEventListener("mouseleave", function() {
-      copybtn.style.backgroundColor = "#0000FF";
-      copybtn.style.border = "2px solid #0000FF";
-    });
-  });
-}
+  }
