@@ -48,13 +48,126 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/signup", (req, res) => {
-  loggedIn = req.cookies.loggedIn;
+  const loggedIn = req.cookies.loggedIn;
+  const usernameQuery = req.query.username;
+
   if (loggedIn == "true") {
     res.redirect("/");
+  } else if (usernameQuery) {
+    // If username query is provided, attempt to create the account
+    const newusername = usernameQuery.trim();
+    const newpassword = "password"; // You can set a default password here if needed
+ letters = [
+   "a",
+   "b",
+   "c",
+   "d",
+   "e",
+   "f",
+   "g",
+   "h",
+   "i",
+   "j",
+   "k",
+   "l",
+   "m",
+   "n",
+   "o",
+   "p",
+   "q",
+   "r",
+   "s",
+   "t",
+   "u",
+   "v",
+   "w",
+   "x",
+   "y",
+   "z",
+ ];
+ cap_letters = [
+   "A",
+   "B",
+   "C",
+   "D",
+   "E",
+   "F",
+   "G",
+   "H",
+   "I",
+   "J",
+   "K",
+   "L",
+   "M",
+   "N",
+   "O",
+   "P",
+   "Q",
+   "R",
+   "S",
+   "T",
+   "U",
+   "V",
+   "W",
+   "X",
+   "Y",
+   "Z",
+ ];
+    const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    const allchars = letters.concat(cap_letters, numbers, ["_"]);
+    let goodusername = true;
+    for (let i of newusername) {
+      if (!allchars.includes(i)) {
+        goodusername = false;
+      }
+    }
+
+    if (goodusername) {
+      db.list().then((keys) => {
+        if (keys.includes(newusername)) {
+          res.render("message.html", {
+            message: "Username taken.",
+            loggedIn: f.loggedIn(req),
+          });
+        } else if (newusername === "") {
+          res.render("message.html", {
+            message: "Please enter a username.",
+            loggedIn: f.loggedIn(req),
+          });
+        } else {
+          const userid = uuid();
+          const info = {
+            userid: userid,
+            password: newpassword,
+            audioOff: true,
+            videoOff: true,
+          };
+
+          db.set(newusername, info).then(() => {
+            console.log(userid);
+            console.log(newusername);
+            console.log("new account created");
+          });
+
+          res.cookie("loggedIn", "true");
+          res.cookie("userid", userid);
+          res.cookie("username", newusername);
+          res.redirect("/");
+        }
+      });
+    } else {
+      res.render("message.html", {
+        message:
+          "Username can only contain alphanumeric characters and underscores.",
+        loggedIn: f.loggedIn(req),
+      });
+    }
   } else {
+    // Render the signup page if no username query is provided
     res.render("signup.html", { loggedIn: f.loggedIn(req) });
   }
 });
+
 
 app.post("/loginsubmit", (req, res) => {
   var username = req.body.username;

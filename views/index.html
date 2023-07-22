@@ -82,13 +82,14 @@
         justify-content: center;
         align-items: center;
       }
+   /* New styles for the buttons */
       .control-button {
-        padding: 10px;
+        padding: 10px 15px;
         font-size: 16px;
-        background: #727acd;
+        background: #4c6ef5;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 30px; /* Increase border radius to make the buttons round */
         cursor: pointer;
         margin: 5px;
         display: flex;
@@ -96,18 +97,19 @@
         justify-content: center;
         transition: background-color 0.3s, transform 0.2s;
       }
-      .control-button i {
-        margin-right: 5px;
-      }
+
       .control-button:hover {
-        background: #5e6ebe;
+        background: #3955c7;
       }
+
       .control-button.clicked {
         transform: scale(0.95);
       }
+
       .control-button.clicked i[data-icon="microphone"]::before {
         content: "\f130"; /* This is the microphone-slash icon */
       }
+
       .control-button.clicked i[data-icon="video"]::before {
         content: "\f4f7"; /* This is the video-slash icon */
       }
@@ -127,6 +129,22 @@
         margin: 5px;
       }
 
+       #usernameForm {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin-bottom: 10px;
+      }
+      #usernameInput {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+
       /* Media Queries */
       @media screen and (max-width: 768px) {
         #main-container {
@@ -144,7 +162,7 @@
     </style>
   </head>
   <body>
-    <div id="top-description">
+      <div id="top-description">
       <div id="main-container">
         <div id="video-container">
           <video id="videoElement" autoplay></video>
@@ -159,29 +177,39 @@
         </div>
         <div id="description-text-wrapper">
           <% if(loggedIn) { %>
+          <!-- If the user is logged in, display a welcome message and "Join Meet" button -->
           <h1 id="description-text">
             Welcome, <%= user %>! EasyMeet allows you to meet with people
             online.
           </h1>
-          <button
-            class="button background-blue"
-            onclick="location.href = '/join'"
-          >
-            Join Meet</button
-          ><br />
+          <button class="button background-blue" onclick="location.href = '/join'">
+            Join Meet
+          </button>
+          <br />
           <button class="button" onclick="location.href = '/help'">
             Help Page
           </button>
           <% } else { %>
+          <!-- If the user is not logged in, display an input field for the username -->
           <h1 id="description-text">
             Chat with Your Friends Securely And For Free
           </h1>
-          <button
-            class="button background-blue"
-            onclick="location.href = '/signup'"
-          >
-            Get started - It's free</button
-          ><br />
+          <form id="usernameForm">
+            <input
+              type="text"
+              id="usernameInput"
+              placeholder="Enter your username"
+            />
+            <button
+              type="button"
+              class="button background-blue"
+              onclick="startChat()"
+            >
+              Get started - It's free
+            </button>
+          </form>
+          <br />
+          <br />
           <button class="button" onclick="location.href = '/login'">
             Login
           </button>
@@ -225,6 +253,18 @@
           main_mute.classList.remove("background-red"); // Remove the red background class
         }
       }
+       function startChat() {
+        const usernameInput = document.getElementById("usernameInput").value;
+        if (!usernameInput.trim()) {
+          alert("Please enter a valid username.");
+        } else {
+          // Redirect to the chat page with the entered username
+          window.location.href = `/signup?username=${usernameInput.trim()}`;
+        }
+      }
+
+      // Add click event listener to the "Get started" button
+   
 
       function toggleVideo() {
         videoOff = !videoOff;
@@ -250,6 +290,10 @@
           button.classList.toggle("clicked");
         });
       });
+         const getStartedButton = document.querySelector(".background-blue");
+      if (getStartedButton) {
+        getStartedButton.addEventListener("click", startChat);
+      }
 
       startCamera();
     </script>
