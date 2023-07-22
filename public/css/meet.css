@@ -16,8 +16,6 @@
 
 body {
   overflow: auto;
-  background-color: var(--main-darklg);
-  color: var(--main-light);
 }
 
 .okbtn,
@@ -54,7 +52,7 @@ body {
   background-color: var(--main-darklg);
 }
 
-.logo>h3 {
+.logo > h3 {
   color: var(--main-light);
 }
 
@@ -94,6 +92,7 @@ video {
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
+  box-shadow: 0 0 15px 5px rgba(0, 0, 255, 0); /* Initial shadow with no intensity */
 }
 
 .video-name {
@@ -172,6 +171,7 @@ video {
 }
 
 .main-message_container>input {
+  height: 50px;
   flex: 1;
   height: 40px;
   padding: 5px 10px;

@@ -120,26 +120,6 @@ function addVideoStream(username, video, stream) {
   video.addEventListener("contextmenu", (e) => {
     e.preventDefault();
   });
-
-  // Audio volume analysis and shadow effect
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const analyser = audioContext.createAnalyser();
-  const source = audioContext.createMediaStreamSource(stream);
-  source.connect(analyser);
-  analyser.fftSize = 256;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  function detectAudioVolume() {
-    analyser.getByteFrequencyData(dataArray);
-    const average = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
-    const intensity = Math.min(1, average / 128); // Normalize intensity between 0 and 1
-    const shadowIntensity = 255 - Math.round(255 * intensity); // Invert intensity for shadow value
-    const shadowColor = `rgba(0, 0, 255, ${shadowIntensity / 255})`; // Blue shadow with variable opacity
-    video.style.boxShadow = `0 0 15px 5px ${shadowColor}`;
-    requestAnimationFrame(detectAudioVolume);
-  }
-  detectAudioVolume();
 }
 
 let text = document.querySelector("#chat_message");
