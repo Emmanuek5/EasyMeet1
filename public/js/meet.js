@@ -32,11 +32,11 @@ navigator.mediaDevices
     audio: true,
     video: true,
   })
-  .then(stream => {
+  .then((stream) => {
     myVideoStream = stream;
     addVideoStream(user, myVideo, stream);
-    myVideoStream.getAudioTracks()[0].enabled = (audioOff == true ? false: true);
-    myVideoStream.getVideoTracks()[0].enabled = (videoOff == true ? false: true);
+    myVideoStream.getAudioTracks()[0].enabled = audioOff == true ? false : true;
+    myVideoStream.getVideoTracks()[0].enabled = videoOff == true ? false : true;
     if (audioOff) {
       myVideoStream.getAudioTracks()[0].enabled = false;
       html = `<i class="fas fa-microphone-slash"></i>`;
@@ -58,15 +58,14 @@ navigator.mediaDevices
       stopVideo.innerHTML = html;
     }
 
-
-    peer.on("call", call => {
+    peer.on("call", (call) => {
       call.answer(stream);
       const video = document.createElement("video");
-      call.on("stream", userVideoStream => {
-        getPeerIds().then(ids => {
-          console.log(call.peer)
+      call.on("stream", (userVideoStream) => {
+        getPeerIds().then((ids) => {
+          console.log(call.peer);
           addVideoStream(ids[call.peer], video, userVideoStream);
-        })
+        });
       });
     });
 
@@ -76,49 +75,72 @@ navigator.mediaDevices
       option.id = "dm_" + username;
       option.innerHTML = username;
       dmusers.appendChild(option);
-      if(!focus) document.getElementById("chat-alert").play();
+      if (!focus) document.getElementById("chat-alert").play();
     });
-    socket.on("leave", user => {
+    socket.on("leave", (user) => {
       document.querySelector("#user_" + user).remove();
       document.querySelector("#dm_" + user).remove();
     });
   })
-  .catch(err => {
-    alertmodal("", "To join this meet you must allow access to your microphone and camera.").then(() => location.href = "/join");
-  })
+  .catch((err) => {
+    alertmodal(
+      "",
+      "To join this meet you must allow access to your microphone and camera."
+    ).then(() => (location.href = "/join"));
+  });
 
-function connectToNewUser(username, id, stream){
+function connectToNewUser(username, id, stream) {
   const call = peer.call(id, stream);
   const video = document.createElement("video");
-  call.on("stream", userVideoStream => {
+  call.on("stream", (userVideoStream) => {
     addVideoStream(username, video, userVideoStream);
   });
-};
+}
 
-peer.on("open", id => {
+peer.on("open", (id) => {
   socket.emit("joined", room, id, user);
 });
 
-function addVideoStream(username, video, stream){
+function addVideoStream(username, video, stream) {
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
     video.id = "user_" + username;
     video.play();
     videoGrid.appendChild(video);
   });
-  video.addEventListener("mouseover", e => {
+  video.addEventListener("mouseover", (e) => {
     videoName.style.display = "block";
-    videoName.style.left = e.pageX + "px"; 
-    videoName.style.top = e.pageY + "px"; 
+    videoName.style.left = e.pageX + "px";
+    videoName.style.top = e.pageY + "px";
     videoName.innerHTML = username;
   });
   video.addEventListener("mouseleave", () => {
     videoName.style.display = "none";
   });
-  video.addEventListener("contextmenu", e => {
+  video.addEventListener("contextmenu", (e) => {
     e.preventDefault();
   });
-};
+
+  // Audio volume analysis and shadow effect
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioContext.createAnalyser();
+  const source = audioContext.createMediaStreamSource(stream);
+  source.connect(analyser);
+  analyser.fftSize = 256;
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  function detectAudioVolume() {
+    analyser.getByteFrequencyData(dataArray);
+    const average = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
+    const intensity = Math.min(1, average / 128); // Normalize intensity between 0 and 1
+    const shadowIntensity = 255 - Math.round(255 * intensity); // Invert intensity for shadow value
+    const shadowColor = `rgba(0, 0, 255, ${shadowIntensity / 255})`; // Blue shadow with variable opacity
+    video.style.boxShadow = `0 0 15px 5px ${shadowColor}`;
+    requestAnimationFrame(detectAudioVolume);
+  }
+  detectAudioVolume();
+}
 
 let text = document.querySelector("#chat_message");
 let send = document.getElementById("send");
@@ -158,36 +180,42 @@ stopVideo.addEventListener("click", () => {
 });
 
 inviteButton.addEventListener("click", () => {
-  promptmodal("Invite someone", "Enter the user you want to invite to this meet:").then(username => {
-    socket.emit("new invitation", {to:username, from:user, room:room});
-    alertmodal("Invited!", `You have invited ${username} to this meet!`).then(console.log)
+  promptmodal(
+    "Invite someone",
+    "Enter the user you want to invite to this meet:"
+  ).then((username) => {
+    socket.emit("new invitation", { to: username, from: user, room: room });
+    alertmodal("Invited!", `You have invited ${username} to this meet!`).then(
+      console.log
+    );
   });
 });
 
-document.getElementById("leave").addEventListener("click", () => location.href = "/join");
+document
+  .getElementById("leave")
+  .addEventListener("click", () => (location.href = "/join"));
 
-function getTime(){
+function getTime() {
   var d = new Date();
   var h = d.getHours();
   var m = d.getMinutes();
-  if(h > 12){
+  if (h > 12) {
     h = h - 12;
-    if(m < 10){
+    if (m < 10) {
       m = "0" + String(m);
-    } 
+    }
     d = String(h) + ":" + String(m) + " PM";
     return d;
-  }
-  else{
-    if(m < 10){
+  } else {
+    if (m < 10) {
       m = "0" + String(m);
-    } 
+    }
     d = String(h) + ":" + String(m) + " AM";
     return d;
   }
 }
 
-async function getPeerIds(){
+async function getPeerIds() {
   let response = await fetch("/peerids");
   return await response.json();
 }

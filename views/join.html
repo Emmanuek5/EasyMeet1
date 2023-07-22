@@ -3,37 +3,126 @@
   <head>
     <title>Join Meet - EasyMeet</title>
     <link href="/css/style.css" rel="stylesheet" />
-    <link href="/css/index.css" rel="stylesheet" />
     <link href="/assets/computer.png" rel="icon" />
-    <link href="/css/joinmeet.css" rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        text-align: center;
+        font-family: Roboto, sans-serif;
+        color: #333;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: whitesmoke;
+      }
+
+      h2 {
+        font-size: 36px;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      label {
+        font-size: 18px;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      input[type="checkbox"] {
+        margin-right: 5px;
+      }
+
+      #room {
+        font-size: 20px;
+        width: 200px;
+        padding: 5px;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .button {
+        padding: 8px 16px;
+        font-size: 16px;
+        background-color: #727acd;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      .button i {
+        margin-right: 5px;
+      }
+
+      .button:hover {
+        background-color: #5e6ebe;
+      }
+
+      .settings-form {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .settings-group {
+        display: flex;
+        align-items: center;
+      }
+    </style>
   </head>
   <body>
-    <% include("nav.html") %>
-    <form action="/submitsettings" method="GET">
-      <div class="form-group">
-        <input type="checkbox" <% if (audioOff) { % />checked<% } %>
-        name="audioOff" id="audioOff">
-        <label for="audioOff">Turn off audio</label>
+    <div class="container">
+      <h2>Join Meet</h2>
+      <input id="room" placeholder="Type room here" />
+      <br /><br />
+      <div class="button-container">
+        <button onclick="chooseRoom()" class="button">
+          <i class="fas fa-door-open"></i> Enter room
+        </button>
+        <button onclick="location.href = '/meet/main'" class="button">
+          <i class="fas fa-users"></i> Join main meet
+        </button>
+        <button onclick="invite()" class="button">
+          <i class="fas fa-user-plus"></i> Invite someone
+        </button>
       </div>
-      <div class="form-group">
-        <input type="checkbox" <% if (videoOff) { % />checked<% } %>
-        name="videoOff" id="videoOff">
-        <label for="videoOff">Turn off video</label>
-      </div>
-      <div class="form-group">
-        <input type="submit" value="OK" class="settings-button" />
-      </div>
-    </form>
-    <h2>Join Meet</h2>
-    <input id="room" placeholder="Type room here" class="room-input" />
-    <br /><br />
-    <button onclick="chooseRoom()" class="join-button">Enter room</button>
-    <br /><br />
-    <button onclick="location.href = '/meet/main'" class="join-button">
-      Join main meet
-    </button>
-    <br /><br />
-    <button onclick="invite()" class="invite-button">Invite someone</button>
+
+      <form action="/submitsettings" method="GET" class="settings-form">
+        <div class="settings-group">
+          <input type="checkbox" <% if (audioOff) { % />checked <% } %>
+          name="audioOff" id="audioOff">
+          <label for="audioOff">Turn off audio</label>
+        </div>
+        <div class="settings-group">
+          <input type="checkbox" <% if (videoOff) { % />checked <% } %>
+          name="videoOff" id="videoOff">
+          <label for="videoOff">Turn off video</label>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="OK" class="button" />
+        </div>
+      </form>
+    </div>
     <script>
       document.getElementById("room").addEventListener("keydown", (e) => {
         if (e.key == "Enter") chooseRoom();
