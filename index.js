@@ -50,6 +50,7 @@ app.get("/login", (req, res) => {
 app.get("/signup", (req, res) => {
   const loggedIn = req.cookies.loggedIn;
   const usernameQuery = req.query.username;
+  const nextParam = req.query.next
 
   if (loggedIn == "true") {
     res.redirect("/");
@@ -152,7 +153,7 @@ app.get("/signup", (req, res) => {
           res.cookie("loggedIn", "true");
           res.cookie("userid", userid);
           res.cookie("username", newusername);
-          res.redirect("/meet/"+uuid());
+          res.redirect(nextParam);
         }
       });
     } else {
@@ -359,7 +360,8 @@ app.get("/meet/:room", (req, res) => {
       }
     });
   } else {
-    res.redirect("/login");
+       let room = req.params.room;
+    res.redirect("/?next=/meet/"+room);
   }
 });
 

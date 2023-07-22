@@ -252,16 +252,28 @@
           muteButton.classList.remove("fa-microphone-slash");
           main_mute.classList.remove("background-red"); // Remove the red background class
         }
-      }
-       function startChat() {
-        const usernameInput = document.getElementById("usernameInput").value;
-        if (!usernameInput.trim()) {
-          alert("Please enter a valid username.");
-        } else {
-          // Redirect to the chat page with the entered username
-          window.location.href = `/signup?username=${usernameInput.trim()}`;
-        }
-      }
+      }function startChat() {
+  const usernameInput = document.getElementById("usernameInput").value;
+  if (!usernameInput.trim()) {
+    alert("Please enter a valid username.");
+  } else {
+    // Get the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Check if there is a parameter called "next"
+    if (urlParams.has("next")) {
+      // Get the value of "next" parameter
+      const nextParam = urlParams.get("next");
+
+      // Redirect to the signup page with the entered username and "next" parameter
+      window.location.href = `/signup?username=${usernameInput.trim()}&next=${nextParam}`;
+    } else {
+      // Redirect to the signup page with just the entered username
+      window.location.href = `/signup?username=${usernameInput.trim()}`;
+    }
+  }
+}
+
 
       // Add click event listener to the "Get started" button
    
