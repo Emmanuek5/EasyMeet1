@@ -104,50 +104,44 @@
         </div>
         <h3>Meet - EasyMeet</h2>
       </div>
-    </div>
-    <div class="main">
-      <div class="main-left">
-        <div class="videos-group">
-          <div id="video-grid"></div>
-        </div>
-        <div class="options">
-          <div class="options-left">
-            <div id="muteButton" class="options-button"><i class="fa fa-microphone"></i></div>
-            <div id="stopVideo" class="options-button"><i class="fa fa-video-camera"></i></div>
-            <div id="screenShareBtn" class="options-button"><i class="fa fa-desktop"></i></div>
-            <div id="leave" class="options-button background-red"><i class="fa fa-phone"></i></div>
-          </div>
-          <div class="options-right">
-            <div id="showChat" class="options-button"><i class="fa fa-comment"></i></div>
-            <div id="inviteButton" class="options-button"><i class="fas fa-user-plus"></i></div>
-          </div>
-        </div>
+    </div>  
+    <div class="main">  
+    <div class="main-left">
+      <div class="videos-group">
+        <div id="video-grid"></div>
       </div>
-      <div class="main-right">
-        <div class="main-chat_window">
-          <div id="recievers">
-            <label style="color:white">Send to: </label>
-            <select id="dm-users">
-              <option>Everyone</option>
-              <% for(i of allusers){ %>
-              <option id="dm_<%= i %>"><%= i %></option>
-              <% } %>
-            </select>
-          </div>
-          <br />
+      <div class="options">
+        <div class="options-left">
+          <div id="muteButton" class="options-button"><i class="fa fa-microphone"></i></div>
+          <div id="stopVideo" class="options-button"><i class="fa fa-video-camera"></i></div>
+          <div id="leave" class="options-button background-red"><i class="fa fa-phone"></i></div>
+        </div>
+        <div class="options-right">
+  <div id="showChat" class="options-button"><i class="fa fa-comment"></i></div>
+  <div id="inviteButton" class="options-button"><i class="fas fa-user-plus"></i></div>
+  <!-- Add the "Share Screen" button with a custom id -->
+  <div id="shareScreenButton" class="options-button">
+    <i class="fa fa-desktop"></i>
+  </div>
+</div>
+      </div>
+    </div>
+    <div class="main-right">
+      <div class="main-chat_window">
+        <div id="recievers"><label style="color:white">Send to: </label><select id="dm-users"><option>Everyone</option><% for(i of allusers){ %><option id="dm_<%= i %>"><%= i %></option><% } %></select></div><br>
           <div class="messages"></div>
-        </div>
-        <div class="main-message_container">
-          <input id="chat_message" type="text" autocomplete="off" placeholder="Type your message here..." />
-          <div id="send" class="options-button">
-            <i class="fa fa-paper-plane" aria-hidden="true"></i>
-          </div>
+      </div>
+      <div class="main-message_container">
+        <input id="chat_message" type="text" autocomplete="off" placeholder="Type your message here...">
+        <div id="send" class="options-button">
+          <i class="fa fa-paper-plane" aria-hidden="true"></i>
         </div>
       </div>
     </div>
-    <script src="/js/modal.js"></script>
-    <script src="/js/recieveinvite.js"></script>
-    <script src="/js/meet.js"></script>
-    <script src="/js/chat.js"></script>
+  </div>
+  <script src="/js/modal.js"></script>
+  <script src="/js/recieveinvite.js"></script>
+  <script src="/js/meet.js"></script>
+  <script src="/js/chat.js"></script>
   </body>
 </html>

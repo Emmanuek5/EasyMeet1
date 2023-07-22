@@ -6,11 +6,6 @@ const dmusers = document.querySelector("#dm-users");
 const videoName = document.querySelector(".video-name");
 myVideo.muted = true;
 
-// Add a new video element for screen sharing
-const screenShareVideo = document.createElement("video");
-screenShareVideo.muted = true;
-screenShareVideo.setAttribute("class", "screen-share-video");
-
 backBtn.addEventListener("click", () => {
   document.querySelector(".main-left").style.display = "flex";
   document.querySelector(".main-left").style.flex = "1";
@@ -32,9 +27,6 @@ var peer = new Peer(undefined, {
 });
 
 let myVideoStream;
-let screenShareStream; // For storing the screen share stream
-let screenShareActive = false; // To check if screen sharing is active
-
 navigator.mediaDevices
   .getUserMedia({
     audio: true,
@@ -45,22 +37,16 @@ navigator.mediaDevices
     addVideoStream(user, myVideo, stream);
     myVideoStream.getAudioTracks()[0].enabled = audioOff == true ? false : true;
     myVideoStream.getVideoTracks()[0].enabled = videoOff == true ? false : true;
-
     if (audioOff) {
       myVideoStream.getAudioTracks()[0].enabled = false;
       html = `<i class="fas fa-microphone-slash"></i>`;
       muteButton.classList.toggle("background-red");
       muteButton.innerHTML = html;
-      // Add mute icon for the local user's video
-      const muteIcon = document.createElement("i");
-      muteIcon.classList.add("fas", "fa-microphone-slash", "mute-icon");
-      myVideo.parentElement.appendChild(muteIcon);
     } else {
       myVideoStream.getAudioTracks()[0].enabled = true;
       html = `<i class="fas fa-microphone"></i>`;
       muteButton.innerHTML = html;
     }
-
     if (videoOff) {
       myVideoStream.getVideoTracks()[0].enabled = false;
       html = `<i class="fas fa-video-slash"></i>`;
@@ -120,13 +106,7 @@ function addVideoStream(username, video, stream) {
   video.addEventListener("loadedmetadata", () => {
     video.id = "user_" + username;
     video.play();
-    if (username === "Screen Share") {
-      // If screen sharing, add the screen share video to the page
-      videoGrid.appendChild(screenShareVideo);
-    } else {
-      // If not screen sharing, add the video to the page
-      videoGrid.appendChild(video);
-    }
+    videoGrid.appendChild(video);
   });
   video.addEventListener("mouseover", (e) => {
     videoName.style.display = "block";
@@ -140,33 +120,6 @@ function addVideoStream(username, video, stream) {
   video.addEventListener("contextmenu", (e) => {
     e.preventDefault();
   });
-
-  // Add mute icon if the user is muted
-  if (stream.getAudioTracks()[0].enabled === false) {
-    const muteIcon = document.createElement("i");
-    muteIcon.classList.add("fas", "fa-microphone-slash", "mute-icon");
-    video.parentElement.appendChild(muteIcon);
-  }
-
-  // Audio volume analysis and shadow effect
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  const analyser = audioContext.createAnalyser();
-  const source = audioContext.createMediaStreamSource(stream);
-  source.connect(analyser);
-  analyser.fftSize = 256;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-
-  function detectAudioVolume() {
-    analyser.getByteFrequencyData(dataArray);
-    const average = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
-    const intensity = Math.min(1, average / 128); // Normalize intensity between 0 and 1
-    const shadowIntensity = 255 - Math.round(255 * intensity); // Invert intensity for shadow value
-    const shadowColor = `rgba(255, 255, 255, ${shadowIntensity / 255})`; // White shadow with variable opacity
-    video.style.boxShadow = `0 0 15px 5px ${shadowColor}`;
-    requestAnimationFrame(detectAudioVolume);
-  }
-  detectAudioVolume();
 }
 
 let text = document.querySelector("#chat_message");
@@ -179,110 +132,71 @@ const stopVideo = document.querySelector("#stopVideo");
 
 muteButton.addEventListener("click", () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
-  if (enabled) {
-    myVideoStream.getAudioTracks()[0].enabled = false;
-    html = `<i class="fas fa-microphone-slash"></i>`;
-    muteButton.classList.toggle("background-red");
-    muteButton.innerHTML = html;
-    // Add mute icon for the local user's video
-    const muteIcon = document.createElement("i");
-    muteIcon.classList.add("fas", "fa-microphone-slash", "mute-icon");
-    myVideo.parentElement.appendChild(muteIcon);
-  } else {
-    myVideoStream.getAudioTracks()[0].enabled = true;
-    html = `<i class="fas fa-microphone"></i>`;
-    muteButton.classList.toggle("background-red");
-    muteButton.innerHTML = html;
-    // Remove mute icon for the local user's video
-    const muteIcons = document.querySelectorAll(".mute-icon");
-    muteIcons.forEach((icon) => icon.parentElement.removeChild(icon));
-  }
+  myVideoStream.getAudioTracks()[0].enabled = !enabled;
+  const icon = enabled ? "fa-microphone" : "fa-microphone-slash";
+  muteButton.classList.toggle("background-red", !enabled);
+  muteButton.innerHTML = `<i class="fas ${icon}"></i>`;
 });
 
 stopVideo.addEventListener("click", () => {
   const enabled = myVideoStream.getVideoTracks()[0].enabled;
-  if (enabled) {
-    myVideoStream.getVideoTracks()[0].enabled = false;
-    html = `<i class="fas fa-video-slash"></i>`;
-    stopVideo.classList.toggle("background-red");
-    stopVideo.innerHTML = html;
+  myVideoStream.getVideoTracks()[0].enabled = !enabled;
+  const icon = enabled ? "fa-video" : "fa-video-slash";
+  stopVideo.classList.toggle("background-red", !enabled);
+  stopVideo.innerHTML = `<i class="fas ${icon}"></i>`;
+});
+
+const shareScreenButton = document.getElementById("shareScreenButton");
+let screenShareStream;
+let isScreenSharing = false;
+
+function startScreenShare() {
+  navigator.mediaDevices
+    .getDisplayMedia({ video: true })
+    .then((stream) => {
+      screenShareStream = stream;
+      const screenShareVideo = document.createElement("video");
+      addVideoStream("ScreenShare", screenShareVideo, screenShareStream);
+      socket.emit("startScreenShare", myUsername);
+      isScreenSharing = true;
+      shareScreenButton.innerText = "Stop Sharing";
+    })
+    .catch((error) => {
+      console.error("Error starting screen share:", error);
+    });
+}
+
+function stopScreenShare() {
+  if (screenShareStream) {
+    screenShareStream.getTracks().forEach((track) => track.stop());
+  }
+  socket.emit("stopScreenShare");
+  isScreenSharing = false;
+  shareScreenButton.innerText = "Share Screen";
+}
+
+shareScreenButton.addEventListener("click", () => {
+  if (isScreenSharing) {
+    stopScreenShare();
   } else {
-    myVideoStream.getVideoTracks()[0].enabled = true;
-    html = `<i class="fas fa-video"></i>`;
-    stopVideo.classList.toggle("background-red");
-    stopVideo.innerHTML = html;
+    startScreenShare();
   }
 });
 
-// Function to handle screen share
-function handleScreenShare() {
-  if (!screenShareActive) {
-    // Obtain screen share stream
-    navigator.mediaDevices
-      .getDisplayMedia({
-        video: {
-          cursor: "always",
-        },
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
-      })
-      .then((stream) => {
-        screenShareStream = stream;
-        toggleScreenShare();
-        screenShareActive = true;
-        // Add the new screen share video element to the page
-        addVideoStream("Screen Share", screenShareVideo, stream);
-        // When screen sharing is stopped, remove the screen share video element
-        screenShareStream.getVideoTracks()[0].addEventListener("ended", () => {
-          stopScreenShare();
-        });
-      })
-      .catch((error) => {
-        console.error("Error accessing screen share:", error);
-      });
-  } else {
+socket.on("startScreenShare", (username) => {
+  if (!isScreenSharing) {
+    startScreenShare();
+  }
+});
+
+socket.on("stopScreenShare", () => {
+  if (isScreenSharing) {
     stopScreenShare();
   }
-}
-
-// Function to toggle screen share
-function toggleScreenShare() {
-  const enabled = !screenShareStream.getVideoTracks()[0].enabled;
-  screenShareStream.getVideoTracks()[0].enabled = enabled;
-  const icon = document.querySelector("#screenShareBtn i");
-  if (enabled) {
-    icon.classList.remove("fa-desktop");
-    icon.classList.add("fa-stop-circle");
-  } else {
-    icon.classList.remove("fa-stop-circle");
-    icon.classList.add("fa-desktop");
-  }
-}
-
-// Function to stop screen sharing
-function stopScreenShare() {
-  if (screenShareActive) {
-    screenShareStream.getTracks().forEach((track) => track.stop());
-    screenShareActive = false;
-    toggleScreenShare();
-    // Remove the screen share video element from the page
-    screenShareVideo.srcObject = null;
-    videoGrid.removeChild(screenShareVideo);
-  }
-}
-
-// Event listener for screen share button click
-const screenShareBtn = document.getElementById("screenShareBtn");
-screenShareBtn.addEventListener("click", handleScreenShare);
+});
 
 inviteButton.addEventListener("click", () => {
-  copyModal(
-    "Copy this link and send it to people you want to meet with",
-    "Copy!",
-    location.href
-  );
+  copyModal("Invite Via Link", "Copy Link", location.href);
 });
 
 document
