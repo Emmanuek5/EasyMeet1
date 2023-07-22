@@ -51,6 +51,10 @@ navigator.mediaDevices
       html = `<i class="fas fa-microphone-slash"></i>`;
       muteButton.classList.toggle("background-red");
       muteButton.innerHTML = html;
+      // Add mute icon for the local user's video
+      const muteIcon = document.createElement("i");
+      muteIcon.classList.add("fas", "fa-microphone-slash", "mute-icon");
+      myVideo.parentElement.appendChild(muteIcon);
     } else {
       myVideoStream.getAudioTracks()[0].enabled = true;
       html = `<i class="fas fa-microphone"></i>`;
@@ -116,7 +120,13 @@ function addVideoStream(username, video, stream) {
   video.addEventListener("loadedmetadata", () => {
     video.id = "user_" + username;
     video.play();
-    videoGrid.appendChild(video);
+    if (username === "Screen Share") {
+      // If screen sharing, add the screen share video to the page
+      videoGrid.appendChild(screenShareVideo);
+    } else {
+      // If not screen sharing, add the video to the page
+      videoGrid.appendChild(video);
+    }
   });
   video.addEventListener("mouseover", (e) => {
     videoName.style.display = "block";
@@ -152,7 +162,7 @@ function addVideoStream(username, video, stream) {
     const average = dataArray.reduce((acc, val) => acc + val, 0) / bufferLength;
     const intensity = Math.min(1, average / 128); // Normalize intensity between 0 and 1
     const shadowIntensity = 255 - Math.round(255 * intensity); // Invert intensity for shadow value
-    const shadowColor = `rgba(0, 0, 255, ${shadowIntensity / 255})`; // Blue shadow with variable opacity
+    const shadowColor = `rgba(255, 255, 255, ${shadowIntensity / 255})`; // White shadow with variable opacity
     video.style.boxShadow = `0 0 15px 5px ${shadowColor}`;
     requestAnimationFrame(detectAudioVolume);
   }
