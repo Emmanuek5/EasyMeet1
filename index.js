@@ -139,7 +139,7 @@ app.get("/signup", (req, res) => {
           const info = {
             userid: userid,
             password: newpassword,
-            audioOff: true,
+            audioOff: false,
             videoOff: true,
           };
 

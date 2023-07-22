@@ -129,10 +129,20 @@
         if (e.key == "Enter") chooseRoom();
       });
 
-      function chooseRoom() {
-        var name = document.getElementById("room").value;
-        location.href = "/meet/" + name;
-      }
+   function chooseRoom() {
+  var name = document.getElementById("room").value;
+
+  // Check if the input contains "/meet/"
+  if (name.includes("/meet/")) {
+    // Extract the room name after "/meet/"
+    var index = name.lastIndexOf("/meet/") + 6; // Add 6 to skip "/meet/"
+    name = name.substring(index);
+  }
+
+  // Redirect to the room
+  location.href = "/meet/" + name;
+}
+
 
       function invite() {
         promptmodal("Invite someone", "Enter the name of the room first:").then(
