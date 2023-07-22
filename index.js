@@ -152,7 +152,7 @@ app.get("/signup", (req, res) => {
           res.cookie("loggedIn", "true");
           res.cookie("userid", userid);
           res.cookie("username", newusername);
-          res.redirect("/");
+          res.redirect("/meet/"+uuid());
         }
       });
     } else {
