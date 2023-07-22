@@ -129,38 +129,74 @@ let messages = document.querySelector(".messages");
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");
 const stopVideo = document.querySelector("#stopVideo");
+
 muteButton.addEventListener("click", () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
-  if (enabled) {
-    myVideoStream.getAudioTracks()[0].enabled = false;
-    html = `<i class="fas fa-microphone-slash"></i>`;
-    muteButton.classList.toggle("background-red");
-    muteButton.innerHTML = html;
-  } else {
-    myVideoStream.getAudioTracks()[0].enabled = true;
-    html = `<i class="fas fa-microphone"></i>`;
-    muteButton.classList.toggle("background-red");
-    muteButton.innerHTML = html;
-  }
+  myVideoStream.getAudioTracks()[0].enabled = !enabled;
+  const icon = enabled ? "fa-microphone" : "fa-microphone-slash";
+  muteButton.classList.toggle("background-red", !enabled);
+  muteButton.innerHTML = `<i class="fas ${icon}"></i>`;
 });
 
 stopVideo.addEventListener("click", () => {
   const enabled = myVideoStream.getVideoTracks()[0].enabled;
-  if (enabled) {
-    myVideoStream.getVideoTracks()[0].enabled = false;
-    html = `<i class="fas fa-video-slash"></i>`;
-    stopVideo.classList.toggle("background-red");
-    stopVideo.innerHTML = html;
+  myVideoStream.getVideoTracks()[0].enabled = !enabled;
+  const icon = enabled ? "fa-video" : "fa-video-slash";
+  stopVideo.classList.toggle("background-red", !enabled);
+  stopVideo.innerHTML = `<i class="fas ${icon}"></i>`;
+});
+
+const shareScreenButton = document.getElementById("shareScreenButton");
+let screenShareStream;
+let isScreenSharing = false;
+
+function startScreenShare() {
+  navigator.mediaDevices
+    .getDisplayMedia({ video: true })
+    .then((stream) => {
+      screenShareStream = stream;
+      const screenShareVideo = document.createElement("video");
+      addVideoStream("ScreenShare", screenShareVideo, screenShareStream);
+      socket.emit("startScreenShare", myUsername);
+      isScreenSharing = true;
+      shareScreenButton.innerText = "Stop Sharing";
+    })
+    .catch((error) => {
+      console.error("Error starting screen share:", error);
+    });
+}
+
+function stopScreenShare() {
+  if (screenShareStream) {
+    screenShareStream.getTracks().forEach((track) => track.stop());
+  }
+  socket.emit("stopScreenShare");
+  isScreenSharing = false;
+  shareScreenButton.innerText = "Share Screen";
+}
+
+shareScreenButton.addEventListener("click", () => {
+  if (isScreenSharing) {
+    stopScreenShare();
   } else {
-    myVideoStream.getVideoTracks()[0].enabled = true;
-    html = `<i class="fas fa-video"></i>`;
-    stopVideo.classList.toggle("background-red");
-    stopVideo.innerHTML = html;
+    startScreenShare();
+  }
+});
+
+socket.on("startScreenShare", (username) => {
+  if (!isScreenSharing) {
+    startScreenShare();
+  }
+});
+
+socket.on("stopScreenShare", () => {
+  if (isScreenSharing) {
+    stopScreenShare();
   }
 });
 
 inviteButton.addEventListener("click", () => {
- copyModal("Invite Via Link", "Copy Link", location.href);
+  copyModal("Invite Via Link", "Copy Link", location.href);
 });
 
 document
