@@ -1,0 +1,52 @@
+ h2 {
+     font-size: 24px;
+     margin-top: 20px;
+ }
+
+ .room-input {
+     padding: 10px;
+     border: 1px solid #ccc;
+     border-radius: 5px;
+     width: 100%;
+     max-width: 400px;
+ }
+
+ .join-button {
+     padding: 10px 20px;
+     background-color: #007bff;
+     color: #fff;
+     border: none;
+     cursor: pointer;
+ }
+
+ .join-button:hover {
+     background-color: #0056b3;
+ }
+
+ .invite-button {
+     padding: 10px 20px;
+     background-color: #007bff;
+     color: #fff;
+     border: none;
+     cursor: pointer;
+ }
+
+ .invite-button:hover {
+     background-color: #0056b3;
+ }
+
+ .form-group {
+     margin-bottom: 15px;
+ }
+
+ .settings-button {
+     padding: 10px 20px;
+     background-color: #007bff;
+     color: #fff;
+     border: none;
+     cursor: pointer;
+ }
+
+ .settings-button:hover {
+     background-color: #0056b3;
+ }
